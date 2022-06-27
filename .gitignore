@@ -3,3 +3,5 @@
 **/.ipynb_checkpoints/**
 creds/**
 !creds/template_credentials.txt
+.idea
+.aws
