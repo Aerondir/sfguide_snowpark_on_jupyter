@@ -4,11 +4,6 @@
 current_dir=$(shell pwd)
 hostname=$(shell hostname)
 
-# Build docker image locally
-db:
-	@echo "--- :docker: Build the Docker container"
-	docker build -t certtest .
-
 build:
 	@echo "--- :docker: Build the Docker container"
 	docker build -t snowparklab docker

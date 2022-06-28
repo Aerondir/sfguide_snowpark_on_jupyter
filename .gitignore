@@ -2,6 +2,7 @@
 **/repl_classes/**
 **/.ipynb_checkpoints/**
 creds/**
+bin/**
 !creds/template_credentials.txt
 .idea
 .aws
