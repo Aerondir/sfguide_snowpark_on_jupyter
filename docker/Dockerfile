@@ -1,8 +1,8 @@
 #
 #  This jdk_test.Dockerfile creates a docker image from the base image https://hub.docker.com/r/almondsh/almond
 #
-ARG almond_version=0.10.9
-ARG scala_kernel_version=2.12.12
+ARG almond_version=0.13.0
+ARG scala_kernel_version=2.13.7
 FROM almondsh/almond:$almond_version-scala-$scala_kernel_version
 USER root
 RUN apt-get update && apt-get install -y wget apt-transport-https gnupg2 xdg-utils
@@ -24,18 +24,23 @@ RUN \
   apt-get install -y \
     google-chrome-stable
 
-#source    https://github.com/DataDog/dd-trace-java-docker-build/blob/master/Dockerfile
-# Install oracle jvm
-# Oracle is periodically removing older versions from the downloads - when that happens one needs to go to
-# https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html to figure out the correct new link.
-# !IMPORTANT! Replace '/otn/' with '/otn-pub/' to work around Oracle login issue
-# See: https://gist.github.com/wavezhang/ba8425f24a968ec9b2a8619d7c2d86a6
-RUN wget -q -O /tmp/oracle-jdk8.tar.gz -c --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" "https://javadl.oracle.com/webapps/download/GetFile/1.8.0_331-b09/165374ff4ea84ef0bbd821706e29b123/linux-i586/jdk-8u331-linux-x64.tar.gz"
-RUN tar xzf /tmp/oracle-jdk8.tar.gz -C /usr/lib/jvm/
-RUN mv /usr/lib/jvm/jdk1.8.0_331 /usr/lib/jvm/oracle8
-RUN rm -f /tmp/oracle-jdk8.tar.gz
+# Install zulu jvms
+#https://github.com/microsoft/java/tree/master/docker/ubuntu
+RUN apt-get -qq update && \
+    apt-get -qq -y --no-install-recommends install gnupg software-properties-common && \
+    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0x219BD9C9 && \
+    apt-add-repository "deb http://repos.azul.com/azure-only/zulu/apt stable main" && \
+    apt-get -qq update && \
+    apt-get -qq -y dist-upgrade && \
+    apt-get -qq -y --no-install-recommends install zulu-8-azure-jdk=8.58.0.13* && \
+    apt-get -qq -y purge gnupg software-properties-common && \
+    apt -y autoremove && \
+    rm -rf /var/lib/apt/lists/*
 
-RUN update-alternatives --install /usr/bin/java java /usr/lib/jvm/oracle8/bin/java 2000
+ENV JAVA_HOME=/usr/lib/jvm/zulu-8-azure-amd64
+
+#RUN update-alternatives --install /usr/bin/java java /usr/lib/jvm/oracle8/bin/java 2000
+#RUN apt remove openjdk-8-jdk
 
 USER jovyan
 RUN pip install Jupyterlab==3.1.17 
