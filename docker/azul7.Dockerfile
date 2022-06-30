@@ -32,12 +32,12 @@ RUN apt-get -qq update && \
     apt-add-repository "deb http://repos.azul.com/azure-only/zulu/apt stable main" && \
     apt-get -qq update && \
     apt-get -qq -y dist-upgrade && \
-    apt-get -qq -y --no-install-recommends install zulu-8-azure-jdk=8.58.0.13* && \
+    apt-get -qq -y --no-install-recommends install zulu-7-azure-jdk=7.50.0.11* && \
     apt-get -qq -y purge gnupg software-properties-common && \
     apt -y autoremove && \
     rm -rf /var/lib/apt/lists/*
 
-ENV JAVA_HOME=/usr/lib/jvm/zulu-8-azure-amd64
+ENV JAVA_HOME=/usr/lib/jvm/zulu-7-azure-amd64
 
 #azul needs more graphics libs
 RUN apt-get update && apt-get install -y mesa-utils libgl1-mesa-glx
@@ -48,7 +48,6 @@ RUN apt-get update && apt-get install -y mesa-utils libgl1-mesa-glx
 #RUN apt-get install -y software-properties-common && \
 #    rm -rf /var/lib/apt/lists/*
 
-#RUN add-apt-repository universe
 RUN set -eux; \
     echo 'deb http://archive.ubuntu.com/ubuntu bionic universe' >> "/etc/apt/sources.list.d/bionic.list"; \
     echo 'deb http://archive.ubuntu.com/ubuntu bionic multiverse' >> "/etc/apt/sources.list.d/bionic.list"; \

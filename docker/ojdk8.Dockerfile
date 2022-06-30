@@ -24,31 +24,26 @@ RUN \
   apt-get install -y \
     google-chrome-stable
 
-# Install zulu jvms
-#https://github.com/microsoft/java/tree/master/docker/ubuntu
-RUN apt-get -qq update && \
-    apt-get -qq -y --no-install-recommends install gnupg software-properties-common && \
-    apt-key adv --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys 0x219BD9C9 && \
-    apt-add-repository "deb http://repos.azul.com/azure-only/zulu/apt stable main" && \
-    apt-get -qq update && \
-    apt-get -qq -y dist-upgrade && \
-    apt-get -qq -y --no-install-recommends install zulu-8-azure-jdk=8.58.0.13* && \
-    apt-get -qq -y purge gnupg software-properties-common && \
-    apt -y autoremove && \
-    rm -rf /var/lib/apt/lists/*
+#source    https://github.com/DataDog/dd-trace-java-docker-build/blob/master/Dockerfile
+# Install oracle jvm
+# Oracle is periodically removing older versions from the downloads - when that happens one needs to go to
+# https://www.oracle.com/java/technologies/javase/javase-jdk8-downloads.html to figure out the correct new link.
+# !IMPORTANT! Replace '/otn/' with '/otn-pub/' to work around Oracle login issue
+# See: https://gist.github.com/wavezhang/ba8425f24a968ec9b2a8619d7c2d86a6
+RUN wget -q -O /tmp/oracle-jdk8.tar.gz -c --no-cookies --no-check-certificate --header "Cookie: oraclelicense=accept-securebackup-cookie" "https://javadl.oracle.com/webapps/download/GetFile/1.8.0_331-b09/165374ff4ea84ef0bbd821706e29b123/linux-i586/jdk-8u331-linux-x64.tar.gz"
+RUN tar xzf /tmp/oracle-jdk8.tar.gz -C /usr/lib/jvm/
+RUN mv /usr/lib/jvm/jdk1.8.0_331 /usr/lib/jvm/oracle8
+RUN rm -f /tmp/oracle-jdk8.tar.gz
 
-ENV JAVA_HOME=/usr/lib/jvm/zulu-8-azure-amd64
-
-#azul needs more graphics libs
-RUN apt-get update && apt-get install -y mesa-utils libgl1-mesa-glx
+RUN update-alternatives --install /usr/bin/java java /usr/lib/jvm/oracle8/bin/java 2000
 
 # install missing from ubuntu 20.04 gnome2 library
 # because java sucks
 # https://github.com/gdelmas/IntelliJDashPlugin/issues/73#issuecomment-396226710
-#RUN apt-get install -y software-properties-common && \
-#    rm -rf /var/lib/apt/lists/*
+RUN apt-get install -y software-properties-common && \
+    rm -rf /var/lib/apt/lists/*
 
-#RUN add-apt-repository universe
+RUN add-apt-repository universe
 RUN set -eux; \
     echo 'deb http://archive.ubuntu.com/ubuntu bionic universe' >> "/etc/apt/sources.list.d/bionic.list"; \
     echo 'deb http://archive.ubuntu.com/ubuntu bionic multiverse' >> "/etc/apt/sources.list.d/bionic.list"; \
@@ -57,12 +52,6 @@ RUN set -eux; \
 
 RUN apt-get update && apt-get -y install libgnome2-0
 
-#RUN update-alternatives --install /usr/bin/java java /usr/lib/jvm/oracle8/bin/java 200
-#RUN apt-get remove openjdk-8-jdk
-#RUN apt-get update && \
-#  apt-get install -y \
-#    openjdk-11-jdk
-
 USER jovyan
-RUN pip install Jupyterlab==3.1.17 
+RUN pip install Jupyterlab==3.1.17
 RUN jupyter labextension install jupyterlab-plotly@5.3.1

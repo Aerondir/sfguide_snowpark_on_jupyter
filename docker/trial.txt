@@ -1,0 +1,38 @@
+https://www.itzgeek.com/how-tos/linux/debian/how-to-install-oracle-java-8-on-debian-9-ubuntu-linux-mint.html
+update-alternatives --config java
+
+export PATH=$PATH:/usr/lib/jvm/jdk1.8.0_221/bin
+export JAVA_HOME=/usr/lib/jvm/jdk1.8.0_221/
+export JRE_HOME=/usr/lib/jvm/jdk1.8.0_221/jre/
+export J2SDKDIR=/usr/lib/jvm/jdk1.8.0_221/
+export J2REDIR=/usr/lib/jvm/jdk1.8.0_221/jre/
+
+openjdk 1.8.0_222 - ERROR Execute exception in user code (Assistive Technology not found: org.GNOME.Accessibility.AtkWrapper)
+java.awt.AWTError: Assistive Technology not found: org.GNOME.Accessibility.AtkWrapper
+https://askubuntu.com/questions/695560/assistive-technology-not-found-awterror
+oracle jdk1.8.0_331 -
+openjdk-11-jdk
+zulu8jdk
+
+println(java.awt.Desktop.isDesktopSupported())
+# scala snippet
+val desktop = java.awt.Desktop.getDesktop()
+println(desktop.isSupported(java.awt.Desktop.Action.BROWSE))
+desktop.browse(new java.net.URI("www.ya.ru"))
+
+# java snippet
+cat <<EOF >>test.java
+import java.awt.*;
+import java.net.URI;
+
+public class test{
+        public static void main(String ...args) throws Exception{
+                Desktop desktop = Desktop.getDesktop();
+                URI uri = new URI(args[0]);
+                System.out.println("desktop.isSupported(Desktop.Action.BROWSE) = " + desktop.isSupported(Desktop.Action.BROWSE));
+                System.out.println("java.awt.Desktop.isDesktopSupported() = " + java.awt.Desktop.isDesktopSupported());
+                desktop.browse(uri);
+        }
+}
+EOF
+javac test.java && java test www.ya.ru
